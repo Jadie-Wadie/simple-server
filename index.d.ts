@@ -16,7 +16,7 @@ export class Server {
 	public options: ServerOptions;
 	public connections: { [key: string]: Socket };
 
-	public constructor(options: RecursivePartial<ServerOptions>);
+	public constructor(options: ServerOptions);
 	public constructor();
 
 	public start(port: number): Promise<void>;
@@ -26,35 +26,27 @@ export class Server {
 export function getFiles(dir: string): Promise<string[]>;
 
 export interface ServerOptions {
-	https: ServerOptionsHTTPS | false;
+	https?: ServerOptionsHTTPS | false;
 
-	api: {
-		prefix: string;
-		routes:
+	api?: {
+		prefix?: string;
+		routes?:
 			| Route[]
 			| {
-					folder: string;
-					load: (filename: string) => Route | Promise<Route>;
+					folder?: string;
+					load?: (filename: string) => Route | Promise<Route>;
 			  };
-		error: RequestHandler;
+		error?: RequestHandler;
 	};
 
-	statics: string[];
+	statics?: string[];
 
-	cors: (cors.CorsOptions | cors.CorsOptionsDelegate)[];
+	cors?: (cors.CorsOptions | cors.CorsOptionsDelegate)[];
 
-	error: RequestHandler;
+	error?: RequestHandler;
 }
 
 export interface Route {
 	name: string;
 	call: RequestHandler;
 }
-
-export type RecursivePartial<T> = {
-	[P in keyof T]?: T[P] extends (infer U)[]
-		? RecursivePartial<U>[]
-		: T[P] extends object
-		? RecursivePartial<T[P]>
-		: T[P];
-};
