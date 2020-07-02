@@ -31,16 +31,18 @@ A list of routes can be provieded to the `api` option.
 
 ```js
 const server = new Server({
-	api: [
-		{
-			name: '/ping',
-			call: (req, res) => res.send('Pong!')
-		},
-		{
-			name: '/hello/:name',
-			call: (req, res) => res.send(`Hello ${req.params.name}!`)
-		}
-	]
+	api: {
+		routes: [
+			{
+				name: '/ping',
+				call: (req, res) => res.send('Pong!')
+			},
+			{
+				name: '/hello/:name',
+				call: (req, res) => res.send(`Hello ${req.params.name}!`)
+			}
+		]
+	}
 });
 ```
 
@@ -49,8 +51,10 @@ Alternatively, routes can be loaded recursively from a folder.
 ```js
 const server = new Server({
 	api: {
-		folder: './api',
-		load: async filename => (await import(filename)).default
+		routes: {
+			folder: './api',
+			load: async filename => (await import(filename)).default
+		}
 	}
 });
 ```
@@ -87,11 +91,14 @@ const server = new Server({
 
 #### Error Handling
 
-A custom handler can be provided to `error`.
+A custom handlers can be provided to `error` and `api.error`.
 
 ```js
 const server = new Server({
-	error: (req, res) => res.redirect('/404-error.html')
+	error: (req, res) => res.redirect('/404-page.html'),
+	api: {
+		error: (req, res) => res.redirect('/404-api.html')
+	}
 });
 ```
 

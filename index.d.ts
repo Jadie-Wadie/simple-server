@@ -19,7 +19,7 @@ export class Server {
 	public constructor(options: RecursivePartial<ServerOptions>);
 	public constructor();
 
-	public start(port: number): void;
+	public start(port: number): Promise<void>;
 	public close(): void;
 }
 

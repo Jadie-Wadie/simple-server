@@ -72,10 +72,13 @@ class Server {
 				this.app.use(this.options.api.prefix + route.name, route.call);
 			}
 		} else {
-			const files = await getFiles(this.options.api.routes.folder);
-			for (const file of files) {
+			for (const file of await getFiles(this.options.api.routes.folder)) {
 				const route = await this.options.api.routes.load(file);
-				this.app.use(this.options.api.prefix + route.name, route.call);
+				if (route?.name !== undefined && route?.call !== undefined)
+					this.app.use(
+						this.options.api.prefix + route.name,
+						route.call
+					);
 			}
 		}
 
