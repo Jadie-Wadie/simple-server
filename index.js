@@ -1,6 +1,6 @@
 // Packages
-const fs = require('fs').promises;
 const { resolve } = require('path');
+const { existsSync, readdirSync } = require('fs');
 
 const http = require('http');
 const https = require('https');
@@ -12,6 +12,8 @@ const cors = require('cors');
 
 // Server
 class Server {
+	methods = ['all', 'get', 'post', 'put', 'delete', 'patch', 'head'];
+
 	options = {
 		https: false,
 
@@ -62,29 +64,41 @@ class Server {
 		this.app.use(bodyParser.json());
 
 		// CORS
-		for (const options of this.options.cors) {
-			this.app.use(cors(options));
-		}
+		if (typeof this.options.cors !== 'object')
+			throw new TypeError('cors must be an object');
+		for (const options of this.options.cors) this.app.use(cors(options));
 
 		// Load Routes
 		if (Array.isArray(this.options.api.routes)) {
 			for (const route of this.options.api.routes) {
-				this.app.use(this.options.api.prefix + route.name, route.call);
+				this.validateRoute(route);
+				this.app[route.verb](
+					this.options.api.prefix + route.name,
+					route.call
+				);
 			}
 		} else {
-			for (const file of await getFiles(this.options.api.routes.folder)) {
+			for (const file of getFiles(this.options.api.routes.folder)) {
 				const route = await this.options.api.routes.load(file);
-				if (route?.name !== undefined && route?.call !== undefined)
-					this.app.use(
+				try {
+					this.validateRoute(route);
+					this.app[route.verb](
 						this.options.api.prefix + route.name,
 						route.call
 					);
+				} catch (err) {
+					if (this.options.api.routes.strict === true) throw err;
+				}
 			}
 		}
 
 		// Load Statics
 		for (const folder of this.options.statics) {
-			this.app.use(express.static(folder));
+			if (existsSync(folder)) {
+				this.app.use(express.static(folder));
+			} else {
+				throw new Error(`${folder} is not a valid folder`);
+			}
 		}
 
 		// 404 Handling
@@ -105,26 +119,41 @@ class Server {
 	}
 
 	// Close the Server
-	async close() {
+	close() {
 		if (this.server === undefined) return;
 
 		this.server.close();
 		for (const key in this.connections) this.connections[key].destroy();
 	}
+
+	// Validate Route
+	validateRoute(route) {
+		if (!this.methods.includes(route.verb))
+			throw new TypeError(`${route.verb} is not a valid HTTP verb`);
+		if (typeof route.name !== 'string')
+			throw new TypeError(`${route.name} is not a string`);
+		if (typeof route.call !== 'function')
+			throw new TypeError(`${route.call} is not a function`);
+
+		return true;
+	}
 }
 
 // Get Files (Recursive)
-async function getFiles(dir) {
-	const dirents = await fs.readdir(dir, {
-		withFileTypes: true
-	});
+function getFiles(dir) {
+	let dirents;
+	try {
+		dirents = readdirSync(dir, {
+			withFileTypes: true
+		});
+	} catch (err) {
+		throw err;
+	}
 
-	const files = await Promise.all(
-		dirents.map(async dirent => {
-			const path = resolve(dir, dirent.name);
-			return dirent.isDirectory() ? getFiles(path) : path;
-		})
-	);
+	const files = dirents.map(dirent => {
+		const path = resolve(dir, dirent.name);
+		return dirent.isDirectory() ? getFiles(path) : path;
+	});
 
 	return files.flat();
 }

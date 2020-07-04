@@ -13,6 +13,8 @@ export class Server {
 	public app: express.Express;
 	public server: http.Server | https.Server;
 
+	public methods: RouteVerb[];
+
 	public options: ServerOptions;
 	public connections: { [key: string]: Socket };
 
@@ -21,9 +23,11 @@ export class Server {
 
 	public start(port: number): Promise<void>;
 	public close(): void;
+
+	public validateRoute(route: Route): true | Error;
 }
 
-export function getFiles(dir: string): Promise<string[]>;
+export function getFiles(dir: string): string[];
 
 export interface ServerOptions {
 	https?: ServerOptionsHTTPS | false;
@@ -35,6 +39,7 @@ export interface ServerOptions {
 			| {
 					folder?: string;
 					load?: (filename: string) => Route | Promise<Route>;
+					strict?: boolean;
 			  };
 		error?: RequestHandler;
 	};
@@ -47,6 +52,9 @@ export interface ServerOptions {
 }
 
 export interface Route {
+	verb: RouteVerb;
 	name: string;
 	call: RequestHandler;
 }
+
+type RouteVerb = 'all' | 'get' | 'post' | 'put' | 'delete' | 'patch' | 'head';

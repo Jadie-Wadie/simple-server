@@ -26,22 +26,40 @@ const server = new Server({
 		ca: readFileSync('chain.pem')
 	}
 });
-server.start(3000);
+await server.start(3000);
 ```
 
 #### API
 
-A list of routes can be provieded to the `api` option.
+##### Route Methods
+
+The following HTTP methods (verbs) are supported:
+
+-   all
+-   get
+-   post
+-   put
+-   delete
+-   patch
+-   head
+
+More information can be found at the [express documentation](https://expressjs.com/en/4x/api.html#app.METHOD).
+
+##### Route Loading
+
+A list of routes can be provided to the `api` option. <br>
 
 ```js
 const server = new Server({
 	api: {
 		routes: [
 			{
+				verb: 'get',
 				name: '/ping',
 				call: (req, res) => res.send('Pong!')
 			},
 			{
+				verb: 'get',
 				name: '/hello/:name',
 				call: (req, res) => res.send(`Hello ${req.params.name}!`)
 			}
@@ -50,25 +68,27 @@ const server = new Server({
 });
 ```
 
-Alternatively, routes can be loaded recursively from a folder.
+Alternatively, routes can be loaded recursively from a folder. <br>
+The `strict` flag indicates whether invalid files should throw errors.
 
 ```js
 const server = new Server({
 	api: {
 		routes: {
-			folder: './api',
-			load: async filename => (await import(filename)).default
+			folder: path.join(__dirname, 'api'),
+			load: async filename => (await import(filename)).default,
+			strict: false
 		}
 	}
 });
 ```
 
-The `getFiles` function can be used for custom route loading.
+The `getFiles` function can be used for custom route loading. `getFiles` is recursive.
 
 ```js
 const { getFiles } = require('@jadiewadie/simple-server');
 
-console.log(await getFiles('./api')); // An array of paths
+getFiles(path.join(__dirname, 'api')); // An array of paths
 ```
 
 #### Statics
@@ -77,7 +97,7 @@ A list of directories to serve as statics can be provided to `statics`.
 
 ```js
 const server = new Server({
-	statics: ['./public']
+	statics: [path.join(__dirname, 'public')]
 });
 ```
 
@@ -99,9 +119,9 @@ A custom handlers can be provided to `error` and `api.error`.
 
 ```js
 const server = new Server({
-	error: (req, res) => res.redirect('/404-page.html'),
+	error: (req, res) => res.redirect('/error.html'),
 	api: {
-		error: (req, res) => res.redirect('/404-api.html')
+		error: (req, res) => res.redirect('/api-error.html')
 	}
 });
 ```
