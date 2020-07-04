@@ -22,7 +22,6 @@
 	"devDependencies": {
 		"@types/cors": "^2.8.6",
 		"@types/express": "^4.17.6",
-		"@types/http-terminator": "^2.0.1",
 		"@types/jest": "^26.0.3",
 		"jest": "^26.1.0",
 		"node-fetch": "^2.6.0"
