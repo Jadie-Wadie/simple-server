@@ -1,40 +1,99 @@
 // Packages
-const { resolve } = require('path');
-const { existsSync, readdirSync } = require('fs');
+import { resolve } from 'path';
+import { existsSync, readdirSync } from 'fs';
 
-const http = require('http');
-const https = require('https');
+import http from 'http';
+import https from 'https';
+import { Socket } from 'net';
 
-const express = require('express');
-const bodyParser = require('body-parser');
+import express from 'express';
+import bodyParser from 'body-parser';
 
-const cors = require('cors');
+import cors from 'cors';
+
+// Enums
+export enum RouteMethod {
+	checkout = 'checkout',
+	copy = 'copy',
+	delete = 'delete',
+	get = 'get',
+	head = 'head',
+	lock = 'lock',
+	merge = 'merge',
+	mkactivity = 'mkactivity',
+	mkcol = 'mkcol',
+	move = 'move',
+	'm-search' = 'm-search',
+	notify = 'notify',
+	options = 'options',
+	patch = 'patch',
+	post = 'post',
+	purge = 'purge',
+	put = 'put',
+	report = 'report',
+	search = 'search',
+	subscribe = 'subscribe',
+	trace = 'trace',
+	unlock = 'unlock',
+	unsubscribe = 'unsubscribe'
+}
+
+// Interfaces
+export interface ServerOptions {
+	https: https.ServerOptions | false;
+	api: {
+		prefix: string;
+		routes:
+			| Route[]
+			| {
+					folder: string;
+					load: (filename: string) => Route | Promise<Route>;
+					strict: boolean;
+			  };
+		error: express.RequestHandler;
+	};
+	statics: string[] | { prefix: string; folder: string }[];
+	cors: (cors.CorsOptions | cors.CorsOptionsDelegate)[];
+	error: express.RequestHandler;
+}
+
+export interface Route {
+	verb: keyof typeof RouteMethod;
+	name: string;
+	call: express.RequestHandler;
+}
+
+type NestedPartial<T> = {
+	[P in keyof T]?: Partial<T[P]>;
+};
 
 // Server
-class Server {
-	methods = ['all', 'get', 'post', 'put', 'delete', 'patch', 'head'];
+export class Server {
+	public app: express.Express;
+	public server: http.Server | https.Server;
 
-	options = {
+	public readonly options: ServerOptions = {
 		https: false,
-
 		api: {
 			prefix: '',
 			routes: [],
 			error: (req, res) => res.sendStatus(404)
 		},
-
 		statics: [],
-
 		cors: [],
-
 		error: (req, res) => res.sendStatus(404)
 	};
 
-	connections = {};
+	private connections: {
+		[key: string]: Socket;
+	} = {};
 
-	constructor(options = {}) {
+	public constructor(options: NestedPartial<ServerOptions> = {}) {
 		// Merge Options
-		const recursiveMerge = (target, source) => {
+		const recursiveMerge = (
+			target: { [key: string]: any },
+			source: { [key: string]: any }
+		) => {
 			for (const key in source) {
 				if (
 					typeof target[key] === 'object' &&
@@ -58,7 +117,7 @@ class Server {
 				: https.createServer(this.options.https, this.app);
 	}
 
-	async start(port) {
+	public async start(port: number) {
 		// BodyParser
 		this.app.use(bodyParser.urlencoded({ extended: false }));
 		this.app.use(bodyParser.json());
@@ -93,11 +152,19 @@ class Server {
 		}
 
 		// Load Statics
-		for (const folder of this.options.statics) {
-			if (existsSync(folder)) {
-				this.app.use(express.static(folder));
+		for (const value of this.options.statics) {
+			if (typeof value === 'string') {
+				if (existsSync(value)) {
+					this.app.use(express.static(value));
+				} else {
+					throw new Error(`${value} is not a valid folder`);
+				}
 			} else {
-				throw new Error(`${folder} is not a valid folder`);
+				if (existsSync(value.folder)) {
+					this.app.use(value.prefix, express.static(value.folder));
+				} else {
+					throw new Error(`${value.folder} is not a valid folder`);
+				}
 			}
 		}
 
@@ -110,16 +177,18 @@ class Server {
 		this.server.listen(port);
 
 		// Record Connections
-		this.server.on('connection', c => {
-			this.connections[c.remoteAddress + ':' + c.remotePort] = c;
-			c.on('close', () => {
-				delete this.connections[c.remoteAddress + ':' + c.remotePort];
+		this.server.on('connection', (connection: Socket) => {
+			const name = connection.remoteAddress + ':' + connection.remotePort;
+
+			this.connections[name] = connection;
+			connection.on('close', () => {
+				delete this.connections[name];
 			});
 		});
 	}
 
 	// Close the Server
-	close() {
+	public close() {
 		if (this.server === undefined) return;
 
 		this.server.close();
@@ -127,8 +196,8 @@ class Server {
 	}
 
 	// Validate Route
-	validateRoute(route) {
-		if (!this.methods.includes(route.verb))
+	public validateRoute(route: Route) {
+		if (RouteMethod[route.verb] === undefined)
 			throw new TypeError(`${route.verb} is not a valid HTTP verb`);
 		if (typeof route.name !== 'string')
 			throw new TypeError(`${route.name} is not a string`);
@@ -140,7 +209,7 @@ class Server {
 }
 
 // Get Files (Recursive)
-function getFiles(dir) {
+export function getFiles(dir: string): string[] {
 	let dirents;
 	try {
 		dirents = readdirSync(dir, {
@@ -157,9 +226,3 @@ function getFiles(dir) {
 
 	return files.flat();
 }
-
-// Export
-module.exports = {
-	Server,
-	getFiles
-};

@@ -16,7 +16,7 @@ npm install @jadiewadie/simple-server
 
 #### HTTPS
 
-The `https` object is provided to `https.createServer()`. See the [documentation](https://nodejs.org/api/https.html#https_https_createserver_options_requestlistener) for more details.
+The `https` object is provided to `https.createServer()`. See the [https documentation](https://nodejs.org/api/https.html#https_https_createserver_options_requestlistener) for more details.
 
 ```js
 const server = new Server({
@@ -31,27 +31,22 @@ await server.start(3000);
 
 #### API
 
-##### Route Methods
+##### Route Definition
 
-The following HTTP methods (verbs) are supported:
+Routes are defined as follows:
 
--   all
--   get
--   post
--   put
--   delete
--   patch
--   head
-
-More information can be found at the [express documentation](https://expressjs.com/en/4x/api.html#app.METHOD).
+`verb` - The HTTP verb of the route. A list of verbs can be found in the [express documentation](https://expressjs.com/en/4x/api.html#app.METHOD). <br>
+`name` - The name of the route. This can include url parameters, such as `/user/:id`. <br>
+`call` - The callback for the route, taking `req`, `res` and `next` as arguments.
 
 ##### Route Loading
 
-A list of routes can be provided to the `api` option. <br>
+A list of routes can be provided to the `api` option. The `prefix` option is also available.
 
 ```js
 const server = new Server({
 	api: {
+		prefix: '/api',
 		routes: [
 			{
 				verb: 'get',
@@ -69,7 +64,7 @@ const server = new Server({
 ```
 
 Alternatively, routes can be loaded recursively from a folder. <br>
-The `strict` flag indicates whether invalid files should throw errors.
+The `strict` flag indicates whether invalid files should throw an error (`true`) or be ignored (`false`).
 
 ```js
 const server = new Server({
@@ -83,10 +78,10 @@ const server = new Server({
 });
 ```
 
-The `getFiles` function can be used for custom route loading. `getFiles` is recursive.
+The recursive `getFiles` function can be used for custom route loading.
 
 ```js
-const { getFiles } = require('@jadiewadie/simple-server');
+import { getFiles } from '@jadiewadie/simple-server';
 
 getFiles(path.join(__dirname, 'api')); // An array of paths
 ```
@@ -98,6 +93,19 @@ A list of directories to serve as statics can be provided to `statics`.
 ```js
 const server = new Server({
 	statics: [path.join(__dirname, 'public')]
+});
+```
+
+Folder paths can be passed alongside prefixes. For example, hosting the `data` folder at the `/data` route.
+
+```js
+const server = new Server({
+	statics: [
+		{
+			prefix: '/data',
+			folder: [path.join(__dirname, 'data')]
+		}
+	]
 });
 ```
 

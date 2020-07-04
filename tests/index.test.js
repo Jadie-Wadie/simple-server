@@ -1,9 +1,10 @@
+// Packages
 const fs = require('fs');
 const path = require('path');
 
 const fetch = require('node-fetch');
 
-const { Server, getFiles } = require('./index');
+const { Server, getFiles } = require('../dist/index');
 
 // Server Tests
 describe('server', () => {
@@ -45,7 +46,7 @@ describe('server', () => {
 
 		server.close();
 
-		expect(res).toStrictEqual('Pong!');
+		expect(res).toBe('Pong!');
 	});
 
 	it('should load routes from an array', async () => {
@@ -87,7 +88,7 @@ describe('server', () => {
 		const server = new Server({
 			api: {
 				routes: {
-					folder: path.join(__dirname, 'test'),
+					folder: path.join(__dirname, 'routes'),
 					load: async filename => await require(filename)
 				}
 			}
@@ -130,17 +131,43 @@ describe('server', () => {
 
 	it('should load a static directory', async () => {
 		const server = new Server({
-			statics: [__dirname]
+			statics: [path.join(__dirname, '..')]
 		});
 		await server.start(3000);
 
-		const file = await (
+		const file1 = fs.readFileSync(path.join(__dirname, '../LICENSE'), {
+			encoding: 'utf8'
+		});
+		const file2 = await (
 			await fetch('http://localhost:3000/LICENSE')
 		).text();
 
 		server.close();
 
-		expect(file).toBe(fs.readFileSync('./LICENSE', { encoding: 'utf8' }));
+		expect(file2).toBe(file1);
+	});
+
+	it('should use a static prefix', async () => {
+		const server = new Server({
+			statics: [
+				{
+					prefix: '/data',
+					folder: path.join(__dirname, '..')
+				}
+			]
+		});
+		await server.start(3000);
+
+		const file1 = fs.readFileSync(path.join(__dirname, '../LICENSE'), {
+			encoding: 'utf8'
+		});
+		const file2 = await (
+			await fetch('http://localhost:3000/data/LICENSE')
+		).text();
+
+		server.close();
+
+		expect(file2).toBe(file1);
 	});
 
 	it('should use a custom error handler', async () => {
@@ -228,8 +255,8 @@ describe('getFiles', () => {
 	});
 
 	it('should return an array of strings', async () => {
-		expect(getFiles(path.join(__dirname, 'test'))).toEqual([
-			path.join(__dirname, 'test/route.js')
+		expect(getFiles(path.join(__dirname, 'routes'))).toEqual([
+			path.join(__dirname, 'routes/route.js')
 		]);
 	});
 });
