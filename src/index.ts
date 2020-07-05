@@ -48,7 +48,7 @@ export interface ServerOptions {
 			| {
 					folder: string;
 					load: (filename: string) => Route | Promise<Route>;
-					strict: boolean;
+					strict?: boolean;
 			  };
 		error: express.RequestHandler;
 	};
