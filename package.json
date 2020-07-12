@@ -23,14 +23,14 @@
 	},
 	"homepage": "https://github.com/Jadie-Wadie/simple-server#readme",
 	"devDependencies": {
-		"@types/cors": "^2.8.6",
-		"@types/express": "^4.17.6",
-		"@types/jest": "^26.0.3",
 		"jest": "^26.1.0",
 		"node-fetch": "^2.6.0",
 		"typescript": "^3.9.6"
 	},
 	"dependencies": {
+		"@types/cors": "^2.8.6",
+		"@types/express": "^4.17.6",
+		"@types/jest": "^26.0.3",
 		"cors": "^2.8.5",
 		"express": "^4.17.1"
 	}
