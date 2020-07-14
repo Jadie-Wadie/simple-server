@@ -40,6 +40,27 @@ export enum RouteMethod {
 
 // Interfaces
 export interface ServerOptions {
+	https?: https.ServerOptions | false;
+	api?: {
+		prefix?: string;
+		routes?:
+			| Route[]
+			| {
+					folder: string;
+					load: (filename: string) => Route | Promise<Route>;
+					strict?: boolean;
+			  };
+		error?: express.RequestHandler;
+	};
+	statics?: {
+		paths?: string[] | { prefix: string; folder: string }[];
+		strict?: boolean;
+	};
+	cors?: (cors.CorsOptions | cors.CorsOptionsDelegate)[];
+	error?: express.RequestHandler;
+}
+
+interface InternalOptions {
 	https: https.ServerOptions | false;
 	api: {
 		prefix: string;
@@ -52,7 +73,10 @@ export interface ServerOptions {
 			  };
 		error: express.RequestHandler;
 	};
-	statics: string[] | { prefix: string; folder: string }[];
+	statics: {
+		paths: string[] | { prefix: string; folder: string }[];
+		strict?: boolean;
+	};
 	cors: (cors.CorsOptions | cors.CorsOptionsDelegate)[];
 	error: express.RequestHandler;
 }
@@ -63,23 +87,19 @@ export interface Route {
 	call: express.RequestHandler;
 }
 
-type NestedPartial<T> = {
-	[P in keyof T]?: Partial<T[P]>;
-};
-
 // Server
 export class Server {
 	public app: express.Express;
 	public server: http.Server | https.Server;
 
-	public readonly options: ServerOptions = {
+	public readonly options: InternalOptions = {
 		https: false,
 		api: {
 			prefix: '',
 			routes: [],
 			error: (req, res) => res.sendStatus(404)
 		},
-		statics: [],
+		statics: { paths: [] },
 		cors: [],
 		error: (req, res) => res.sendStatus(404)
 	};
@@ -88,7 +108,7 @@ export class Server {
 		[key: string]: Socket;
 	} = {};
 
-	public constructor(options: NestedPartial<ServerOptions> = {}) {
+	public constructor(options: ServerOptions = {}) {
 		// Merge Options
 		const recursiveMerge = (
 			target: { [key: string]: any },
@@ -152,18 +172,22 @@ export class Server {
 		}
 
 		// Load Statics
-		for (const value of this.options.statics) {
+		for (const value of this.options.statics.paths) {
 			if (typeof value === 'string') {
 				if (existsSync(value)) {
 					this.app.use(express.static(value));
 				} else {
-					throw new Error(`${value} is not a valid folder`);
+					if (this.options.statics.strict === true)
+						throw new Error(`${value} is not a valid folder`);
 				}
 			} else {
 				if (existsSync(value.folder)) {
 					this.app.use(value.prefix, express.static(value.folder));
 				} else {
-					throw new Error(`${value.folder} is not a valid folder`);
+					if (this.options.statics.strict === true)
+						throw new Error(
+							`${value.folder} is not a valid folder`
+						);
 				}
 			}
 		}
@@ -185,14 +209,20 @@ export class Server {
 				delete this.connections[name];
 			});
 		});
+
+		// Enable Chaining
+		return this;
 	}
 
-	// Close the Server
 	public close() {
 		if (this.server === undefined) return;
 
+		// Close the Server
 		this.server.close();
 		for (const key in this.connections) this.connections[key].destroy();
+
+		// Enable Chaining
+		return this;
 	}
 
 	// Validate Route

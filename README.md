@@ -63,7 +63,7 @@ const server = new Server({
 });
 ```
 
-Alternatively, routes can be loaded recursively from a folder. <br>
+Alternatively, routes can be loaded recursively from a folder.<br>
 The `strict` flag indicates whether invalid files should throw an error (`true`) or be ignored (`false`).
 
 ```js
@@ -72,7 +72,7 @@ const server = new Server({
 		routes: {
 			folder: path.join(__dirname, 'api'),
 			load: async filename => (await import(filename)).default,
-			strict: false
+			strict: true
 		}
 	}
 });
@@ -88,11 +88,15 @@ getFiles(path.join(__dirname, 'api')); // An array of paths
 
 #### Statics
 
-A list of directories to serve as statics can be provided to `statics`.
+A list of directories to serve as statics can be provided to `statics`.<br>
+The `strict` flag indicates whether invalid paths should throw an error (`true`) or be ignored (`false`).
 
 ```js
 const server = new Server({
-	statics: [path.join(__dirname, 'public')]
+	statics: {
+		paths: [path.join(__dirname, 'public')],
+		strict: true
+	}
 });
 ```
 
@@ -100,12 +104,14 @@ Folder paths can be passed alongside prefixes. For example, hosting the `data` f
 
 ```js
 const server = new Server({
-	statics: [
-		{
-			prefix: '/data',
-			folder: [path.join(__dirname, 'data')]
-		}
-	]
+	statics: {
+		paths: [
+			{
+				prefix: '/data',
+				folder: [path.join(__dirname, 'data')]
+			}
+		]
+	}
 });
 ```
 
