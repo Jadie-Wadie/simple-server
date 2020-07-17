@@ -32,19 +32,21 @@
 		"@types/node": "^14.0.23"
 	},
 	"devDependencies": {
-		"live-server": "^1.2.1",
-		"nodemon": "^2.0.4",
-		"rimraf": "^3.0.2",
 		"@types/jest": "^26.0.4",
 		"@types/node-fetch": "^2.5.7",
 		"@types/source-map-support": "^0.5.2",
+		"codecov": "^3.7.0",
 		"jest": "^26.1.0",
+		"live-server": "^1.2.1",
 		"node-fetch": "^2.6.0",
+		"nodemon": "^2.0.4",
+		"rimraf": "^3.0.2",
 		"source-map-support": "^0.5.19",
 		"ts-jest": "^26.1.2",
 		"typescript": "^3.9.7"
 	},
 	"jest": {
+		"coverageDirectory": "coverage",
 		"transform": {
 			"^.+\\.tsx?$": "ts-jest"
 		},
