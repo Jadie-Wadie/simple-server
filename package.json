@@ -1,6 +1,6 @@
 {
 	"name": "@jadiewadie/simple-server",
-	"version": "2.2.0",
+	"version": "2.2.1",
 	"description": "A simple HTTP/S server, built using express",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
