@@ -10,6 +10,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 
 import cors from 'cors';
+import e from 'express';
 
 // Enums
 export enum RouteMethod {
@@ -56,7 +57,7 @@ export interface ServerOptions {
 		paths?: string[] | { prefix: string; folder: string }[];
 		strict?: boolean;
 	};
-	cors?: (cors.CorsOptions | cors.CorsOptionsDelegate)[];
+	cors?: cors.CorsOptions | cors.CorsOptionsDelegate | boolean;
 	error?: express.RequestHandler;
 }
 
@@ -77,7 +78,7 @@ interface InternalOptions {
 		paths: string[] | { prefix: string; folder: string }[];
 		strict?: boolean;
 	};
-	cors: (cors.CorsOptions | cors.CorsOptionsDelegate)[];
+	cors?: cors.CorsOptions | cors.CorsOptionsDelegate | boolean;
 	error: express.RequestHandler;
 }
 
@@ -100,7 +101,7 @@ export class Server {
 			error: (req, res) => res.sendStatus(404)
 		},
 		statics: { paths: [] },
-		cors: [],
+		cors: undefined,
 		error: (req, res) => res.sendStatus(404)
 	};
 
@@ -143,12 +144,21 @@ export class Server {
 		this.app.use(bodyParser.json());
 
 		// CORS
-		if (typeof this.options.cors !== 'object')
-			throw new TypeError('cors must be an object');
-		for (const options of this.options.cors) this.app.use(cors(options));
+		if (this.options.cors !== undefined) {
+			switch (typeof this.options.cors) {
+				case 'object':
+					this.app.use(cors(this.options.cors));
+					break;
+				case 'boolean':
+					if (this.options.cors === true) this.app.use(cors());
+					break;
+				default:
+					throw new TypeError('cors must be boolean or an object');
+			}
+		}
 
 		// Load Routes
-		if (Array.isArray(this.options.api.routes)) {
+		else if (Array.isArray(this.options.api.routes)) {
 			for (const route of this.options.api.routes) {
 				this.validateRoute(route);
 				this.app[route.verb](
@@ -215,8 +225,6 @@ export class Server {
 	}
 
 	public close() {
-		if (this.server === undefined) return;
-
 		// Close the Server
 		this.server.close();
 		for (const key in this.connections) this.connections[key].destroy();
