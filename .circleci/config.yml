@@ -14,7 +14,6 @@ jobs:
                   - run: npm test
             - codecov/upload:
               file: { { coverage_report_filepath } }
-
 workflows:
     build:
         jobs:
