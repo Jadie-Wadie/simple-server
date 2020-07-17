@@ -5,8 +5,8 @@
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"scripts": {
-		"test": "jest --coverage",
-		"test:watch": "jest --coverage --watchAll",
+		"test": "jest",
+		"test:watch": "jest --watchAll",
 		"view:coverage": "live-server coverage/lcov-report",
 		"prepare": "tsc",
 		"clean": "rimraf coverage dist"
@@ -61,6 +61,7 @@
 			"lcov",
 			"text",
 			"clover"
-		]
+		],
+		"collectCoverage": true
 	}
 }

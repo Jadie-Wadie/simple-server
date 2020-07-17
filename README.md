@@ -1,7 +1,7 @@
 # simple-server
 
 ![NPM Version](https://img.shields.io/npm/v/@jadiewadie/simple-server)
-![NPM Downloads](https://img.shields.io/npm/dw/@jadiewadie/simple-server)
+![NPM Downloads](https://img.shields.io/npm/dm/@jadiewadie/simple-server)
 ![NPM License](https://img.shields.io/npm/l/@jadiewadie/simple-server)
 
 A simple HTTP/S server, built using [express](https://expressjs.com/)

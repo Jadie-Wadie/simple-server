@@ -158,7 +158,7 @@ export class Server {
 		}
 
 		// Load Routes
-		else if (Array.isArray(this.options.api.routes)) {
+		if (Array.isArray(this.options.api.routes)) {
 			for (const route of this.options.api.routes) {
 				this.validateRoute(route);
 				this.app[route.verb](

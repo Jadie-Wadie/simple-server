@@ -506,7 +506,7 @@ describe('getFiles', () => {
 	});
 
 	it('should return an array of strings', async () => {
-		expect(getFiles(path.join(__dirname, '../test/routes'))).toEqual([
+		expect(getFiles(path.join(__dirname, '../tests/routes'))).toEqual([
 			path.join(__dirname, 'routes/error/error.ts'),
 			path.join(__dirname, 'routes/route.ts')
 		]);
