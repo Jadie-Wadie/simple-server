@@ -12,7 +12,7 @@ jobs:
                       - run: npm install
                       - run: npm test
             - codecov/upload:
-                  file: './coverage/clover.xml'
+                  file: ./coverage
 workflows:
     build:
         jobs:
