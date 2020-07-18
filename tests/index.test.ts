@@ -3,6 +3,8 @@ import fs from 'fs';
 import path from 'path';
 
 import fetch from 'node-fetch';
+
+import { Agent } from 'https';
 import { AddressInfo } from 'net';
 
 import { Server, getFiles, ServerOptions } from '../src';
@@ -31,20 +33,42 @@ describe('server', () => {
 		expect(ports2).toStrictEqual(ports1);
 	});
 
-	it('should use https', async () => {
-		const server = new Server({ https: {} });
-		await server.start(3000);
+	describe('https', () => {
+		it('should generate a self-signed certificate', async () => {
+			const server = new Server({ https: true });
+			await server.start(3000);
 
-		let error = false;
-		try {
-			await fetch('http://localhost:3000/');
-		} catch (err) {
-			error = true;
-		}
+			let error = false;
+			try {
+				await fetch('https://localhost:3000/', {
+					agent: new Agent({
+						rejectUnauthorized: false
+					})
+				});
+			} catch (err) {
+				error = true;
+			}
 
-		server.close();
+			server.close();
 
-		expect(error).toBeTruthy();
+			expect(error).toBeFalsy();
+		});
+
+		it('should accept an object', async () => {
+			const server = new Server({ https: {} });
+			await server.start(3000);
+
+			let error = false;
+			try {
+				await fetch('http://localhost:3000/');
+			} catch (err) {
+				error = true;
+			}
+
+			server.close();
+
+			expect(error).toBeTruthy();
+		});
 	});
 
 	describe('api', () => {

@@ -10,7 +10,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 
 import cors from 'cors';
-import e from 'express';
+import selfsigned from 'selfsigned';
 
 // Enums
 export enum RouteMethod {
@@ -41,7 +41,7 @@ export enum RouteMethod {
 
 // Interfaces
 export interface ServerOptions {
-	https?: https.ServerOptions | false;
+	https?: https.ServerOptions | boolean;
 	api?: {
 		prefix?: string;
 		routes?:
@@ -62,7 +62,7 @@ export interface ServerOptions {
 }
 
 interface InternalOptions {
-	https: https.ServerOptions | false;
+	https: https.ServerOptions | boolean;
 	api: {
 		prefix: string;
 		routes:
@@ -132,10 +132,27 @@ export class Server {
 
 		// Setup Server
 		this.app = express();
-		this.server =
-			this.options.https === false
-				? http.createServer(this.app)
-				: https.createServer(this.options.https, this.app);
+		switch (this.options.https) {
+			case true:
+				const cert = selfsigned.generate(
+					{ name: 'secure', value: 'localhost' },
+					{ days: 365 }
+				);
+				this.server = https.createServer(
+					{
+						key: cert.private,
+						cert: cert.cert
+					},
+					this.app
+				);
+				break;
+			case false:
+				this.server = http.createServer(this.app);
+				break;
+			default:
+				this.server = https.createServer(this.options.https, this.app);
+				break;
+		}
 	}
 
 	public async start(port: number) {

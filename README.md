@@ -8,17 +8,20 @@
 
 A simple HTTP/S server, built using [express](https://expressjs.com/)
 
-### Installation
+## Installation
 
-```
+Install with [NPM](https://www.npmjs.com/).
+
+```cmd
 npm install @jadiewadie/simple-server
 ```
 
-### Usage
+## Usage
 
-#### HTTPS
+### HTTPS
 
-The `https` object is provided to `https.createServer()`. See the [https documentation](https://nodejs.org/api/https.html#https_https_createserver_options_requestlistener) for more details.
+The `https` object is provided to `https.createServer()`.<br>
+See the [https documentation](https://nodejs.org/api/https.html#https_https_createserver_options_requestlistener) for more details.
 
 ```js
 const server = new Server({
@@ -31,9 +34,18 @@ const server = new Server({
 await server.start(3000);
 ```
 
-#### API
+The server can also generate a self-signed certificate, using [selfsigned](https://www.npmjs.com/package/selfsigned).
 
-##### Route Definition
+```js
+const server = new Server({
+	https: true
+});
+await server.start(3000);
+```
+
+### API
+
+#### Route Definition
 
 Routes are defined as follows:
 
@@ -41,7 +53,7 @@ Routes are defined as follows:
 `name` - The name of the route. This can include url parameters, such as `/user/:id`. <br>
 `call` - The callback for the route, taking `req`, `res` and `next` as arguments.
 
-##### Route Loading
+#### Route Loading
 
 A list of routes can be provided to the `api` option. The `prefix` option is also available.
 
@@ -88,7 +100,7 @@ import { getFiles } from '@jadiewadie/simple-server';
 getFiles(path.join(__dirname, 'api')); // An array of paths
 ```
 
-#### Statics
+### Statics
 
 A list of directories to serve as statics can be provided to `statics`.<br>
 The `strict` flag indicates whether invalid paths should throw an error (`true`) or be ignored (`false`).
@@ -117,7 +129,7 @@ const server = new Server({
 });
 ```
 
-#### CORS
+### CORS
 
 The `cors` object is provided as configuration to the [cors](https://www.npmjs.com/package/cors#configuration-options) package.
 
@@ -129,7 +141,7 @@ const server = new Server({
 });
 ```
 
-#### Error Handling
+### Error Handling
 
 A custom handlers can be provided to `error` and `api.error`.
 
