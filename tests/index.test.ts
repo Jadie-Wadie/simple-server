@@ -7,7 +7,7 @@ import fetch from 'node-fetch';
 import { Agent } from 'https';
 import { AddressInfo } from 'net';
 
-import { Server, getFiles, ServerOptions } from '../src';
+import { Server, ServerOptions, getFiles } from '../src';
 
 // Server Tests
 describe('server', () => {

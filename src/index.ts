@@ -4,13 +4,14 @@ import { existsSync, readdirSync } from 'fs';
 
 import http from 'http';
 import https from 'https';
-import { Socket } from 'net';
 
 import express from 'express';
 import bodyParser from 'body-parser';
 
 import cors from 'cors';
 import selfsigned from 'selfsigned';
+
+import { Socket } from 'net';
 
 // Enums
 export enum RouteMethod {
@@ -136,7 +137,7 @@ export class Server {
 			case true:
 				const cert = selfsigned.generate(
 					{ name: 'secure', value: 'localhost' },
-					{ days: 365 }
+					{ days: 365, keySize: 2048 }
 				);
 				this.server = https.createServer(
 					{

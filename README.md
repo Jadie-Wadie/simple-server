@@ -1,12 +1,9 @@
 # simple-server
 
-![CircleCI](https://img.shields.io/circleci/build/github/Jadie-Wadie/simple-server)
-![Coveralls](https://img.shields.io/coveralls/github/Jadie-Wadie/simple-server)
-![NPM Version](https://img.shields.io/npm/v/@jadiewadie/simple-server)
-![NPM Downloads](https://img.shields.io/npm/dm/@jadiewadie/simple-server)
-![NPM License](https://img.shields.io/npm/l/@jadiewadie/simple-server)
+[![Build Status](https://drone.roundsquare.site/api/badges/Jadie-Wadie/simple-server/status.svg)](https://drone.roundsquare.site/Jadie-Wadie/simple-server)
+[![Coverage Status](https://coveralls.io/repos/github/Jadie-Wadie/simple-server/badge.svg?branch=master)](https://coveralls.io/github/Jadie-Wadie/simple-server?branch=master)
 
-A simple HTTP/S server, built using [express](https://expressjs.com/)
+A simple HTTP/s server, built using [express](https://expressjs.com/)
 
 ## Installation
 
@@ -20,8 +17,7 @@ npm install @jadiewadie/simple-server
 
 ### HTTPS
 
-The `https` object is provided to `https.createServer()`.<br>
-See the [https documentation](https://nodejs.org/api/https.html#https_https_createserver_options_requestlistener) for more details.
+The `https` object is provided to [`https.createServer()`](https://nodejs.org/api/https.html#https_https_createserver_options_requestlistener).
 
 ```js
 const server = new Server({
@@ -34,7 +30,7 @@ const server = new Server({
 await server.start(3000);
 ```
 
-The server can also generate a self-signed certificate, using [selfsigned](https://www.npmjs.com/package/selfsigned).
+It can also generate a [self-signed](https://www.npmjs.com/package/selfsigned) certificate.
 
 ```js
 const server = new Server({
@@ -49,9 +45,11 @@ await server.start(3000);
 
 Routes are defined as follows:
 
-`verb` - The HTTP verb of the route. A list of verbs can be found in the [express documentation](https://expressjs.com/en/4x/api.html#app.METHOD). <br>
-`name` - The name of the route. This can include url parameters, such as `/user/:id`. <br>
-`call` - The callback for the route, taking `req`, `res` and `next` as arguments.
+| Field  | Value                                                                          |
+| ------ | ------------------------------------------------------------------------------ |
+| `verb` | The HTTP [verb](https://expressjs.com/en/4x/api.html#app.METHOD) of the route. |
+| `name` | The name of the route. This can include url parameters, such as `/user/:id`.   |
+| `call` | The callback for the route, taking `req`, `res` and `next` as arguments.       |
 
 #### Route Loading
 
@@ -77,8 +75,7 @@ const server = new Server({
 });
 ```
 
-Alternatively, routes can be loaded recursively from a folder.<br>
-The `strict` flag indicates whether invalid files should throw an error (`true`) or be ignored (`false`).
+Alternatively, routes can be loaded recursively from a folder. The `strict` flag indicates whether invalid files should throw an error (`true`) or be ignored (`false`).
 
 ```js
 const server = new Server({
@@ -102,8 +99,7 @@ getFiles(path.join(__dirname, 'api')); // An array of paths
 
 ### Statics
 
-A list of directories to serve as statics can be provided to `statics`.<br>
-The `strict` flag indicates whether invalid paths should throw an error (`true`) or be ignored (`false`).
+A list of directories to serve as statics can be provided to `statics`. The `strict` flag indicates whether invalid paths should throw an error (`true`) or be ignored (`false`).
 
 ```js
 const server = new Server({
@@ -147,9 +143,9 @@ A custom handlers can be provided to `error` and `api.error`.
 
 ```js
 const server = new Server({
-	error: (req, res) => res.redirect('/error.html'),
+	error: (req, res) => res.redirect('/404.html'),
 	api: {
-		error: (req, res) => res.redirect('/api-error.html')
+		error: (req, res) => res.redirect('/404-api.html')
 	}
 });
 ```
