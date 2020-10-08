@@ -1,6 +1,6 @@
 {
 	"name": "@jadiewadie/simple-server",
-	"version": "2.3.1",
+	"version": "2.3.2",
 	"description": "A simple HTTP/S server, built using express",
 	"keywords": [
 		"express"
