@@ -3,16 +3,16 @@ type: docker
 name: default
 
 steps:
-  - name: test
+  - name: jest
     image: node
     commands:
       - npm install
       - npm test
 
-  - name: coverage
-    image: lizheming/drone-coveralls
+  - name: codecov
+    image: plugins/codecov
     settings:
       token:
-        from_secret: COVERALLS_REPO_TOKEN
+        from_secret: CODECOV_TOKEN
       files:
         - ./coverage/lcov.info

@@ -1,7 +1,7 @@
 # simple-server
 
-[![Build Status](https://drone.roundsquare.site/api/badges/Jadie-Wadie/simple-server/status.svg)](https://drone.roundsquare.site/Jadie-Wadie/simple-server)
-[![Coverage Status](https://coveralls.io/repos/github/Jadie-Wadie/simple-server/badge.svg?branch=master)](https://coveralls.io/github/Jadie-Wadie/simple-server?branch=master)
+[![Build Status](https://img.shields.io/drone/build/Jadie-Wadie/simple-server?server=https%3A%2F%2Fdrone.roundsquare.site)](https://drone.roundsquare.site/Jadie-Wadie/simple-server)
+[![Coverage Status](https://img.shields.io/codecov/c/github/Jadie-Wadie/simple-server)](https://codecov.io/gh/Jadie-Wadie/simple-server)
 
 A simple HTTP/s server, built using [express](https://expressjs.com/)
 
@@ -9,7 +9,7 @@ A simple HTTP/s server, built using [express](https://expressjs.com/)
 
 Install with [NPM](https://www.npmjs.com/).
 
-```cmd
+```sh
 npm install @jadiewadie/simple-server
 ```
 
