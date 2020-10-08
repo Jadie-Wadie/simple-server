@@ -18,8 +18,8 @@
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"scripts": {
+		"build": "tsc",
 		"lint": "prettier -w ./**/*.* && sort-package-json",
-		"prepare": "tsc",
 		"rimraf": "rimraf coverage dist",
 		"test": "jest",
 		"test:watch": "concurrently -r \"jest --watchAll\" \"live-server coverage/lcov-report --quiet\""

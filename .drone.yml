@@ -1,18 +1,45 @@
 kind: pipeline
 type: docker
-name: default
+name: test
 
 steps:
-  - name: jest
+  - name: build
     image: node
     commands:
       - npm install
+      - npm build
+
+  - name: test
+    image: node
+    commands:
       - npm test
 
-  - name: codecov
+  - name: coverage
     image: plugins/codecov
     settings:
       token:
         from_secret: CODECOV_TOKEN
       files:
         - ./coverage/lcov.info
+
+---
+kind: pipeline
+type: docker
+name: publish
+
+steps:
+  - name: build
+    image: node
+    commands:
+      - npm install
+      - npm build
+
+  - name: npm
+    image: plugins/npm
+    settings:
+      token:
+        from_secret: NPM_TOKEN
+
+trigger:
+  event:
+    - tag
