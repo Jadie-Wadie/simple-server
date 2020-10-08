@@ -16,7 +16,3 @@ steps:
         from_secret: COVERALLS_REPO_TOKEN
       files:
         - ./coverage/lcov.info
-
-trigger:
-  event:
-    - tag
