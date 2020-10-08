@@ -22,6 +22,10 @@ steps:
       files:
         - ./coverage/lcov.info
 
+trigger:
+  event:
+    - push
+
 ---
 kind: pipeline
 type: docker
