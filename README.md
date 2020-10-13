@@ -15,6 +15,15 @@ npm install @jadiewadie/simple-server
 
 ## Usage
 
+To create a server, use the `Server` constructor. Then, call `server.start` with a port.
+
+```js
+const server = new Server();
+await server.start(3000);
+```
+
+## Configuration
+
 ### HTTPS
 
 The `https` object is provided to [`https.createServer()`](https://nodejs.org/api/https.html#https_https_createserver_options_requestlistener).
@@ -139,7 +148,7 @@ const server = new Server({
 
 ### Error Handling
 
-A custom handlers can be provided to `error` and `api.error`.
+Error handlers can be provided to `error` and `api.error`.
 
 ```js
 const server = new Server({
